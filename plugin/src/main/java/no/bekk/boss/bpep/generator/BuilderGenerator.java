@@ -108,13 +108,13 @@ public class BuilderGenerator implements Generator {
 
 	private void createCopyConstructor(PrintWriter pw, IType clazz, List<IField> fields) {
 		String clazzName = clazz.getElementName();
-		pw.println("    public Builder() {");
-		pw.println("    }");
+		pw.println("        public Builder() {");
+		pw.println("        }");
 		pw.println();
-		pw.println("    public Builder(" + clazzName + " bean) {");
+		pw.println("        public Builder(" + clazzName + " bean) {");
 		for (IField field : fields)
-			pw.println("        this." + getName(field) + " = bean." + getName(field) + ";");
-		pw.println("    }");
+			pw.println("            this." + getName(field) + " = bean." + getName(field) + ";");
+		pw.println("        }");
 
 	}
 
@@ -153,13 +153,13 @@ public class BuilderGenerator implements Generator {
 			String fieldType = getType(field);
 			String baseName = getFieldBaseName(fieldName);
 			String parameterName = baseName + BUILDER_METHOD_PARAMETER_SUFFIX;
-			pw.println("        public Builder " + baseName + "(" + fieldType + " " + parameterName + ") {");
-			pw.println("            this." + fieldName + "=" + parameterName + ";");
-			pw.println("            return this;");
-			pw.println("        }");
-                        pw.println();
 			pw.println("        public " + fieldType + " " + baseName + "() {");
 			pw.println("            return this." + fieldName+";");
+			pw.println("        }");
+                        pw.println();
+			pw.println("        public Builder " + baseName + "(" + fieldType + " " + parameterName + ") {");
+			pw.println("            this." + fieldName + " = " + parameterName + ";");
+			pw.println("            return this;");
 			pw.println("        }");
                         pw.println();
 		}
