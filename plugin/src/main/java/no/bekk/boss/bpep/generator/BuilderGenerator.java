@@ -42,7 +42,7 @@ public class BuilderGenerator implements Generator {
 			StringWriter sw = new StringWriter();
 			PrintWriter pw = new PrintWriter(sw);
 			pw.println();
-			pw.println("public static class Builder {");
+			pw.println("    public static class Builder {");
 
 			IType clazz = cu.getTypes()[0];
 
@@ -57,10 +57,10 @@ public class BuilderGenerator implements Generator {
 			createBuilderMethods(pw, fields);
 			if (createBuilderConstructor) {
 				createPrivateBuilderConstructor(pw, clazz, fields);
-				pw.println("}");
+                                pw.println("    }");
 			} else {
 				createClassBuilderConstructor(pw, clazz, fields);
-				pw.println("}");
+				pw.println("    }");
 				createClassConstructor(pw, clazz, fields);
 			}
 			
@@ -108,41 +108,43 @@ public class BuilderGenerator implements Generator {
 
 	private void createCopyConstructor(PrintWriter pw, IType clazz, List<IField> fields) {
 		String clazzName = clazz.getElementName();
-		pw.println("public Builder(){}");
-		pw.println("public Builder(" + clazzName + " bean){");
-		for (IField field : fields) {
-			pw.println("this." + getName(field) + "=bean." + getName(field)
-					+ ";");
-		}
-		pw.println("}");
+		pw.println("    public Builder() {");
+		pw.println("    }");
+		pw.println();
+		pw.println("    public Builder(" + clazzName + " bean) {");
+		for (IField field : fields)
+			pw.println("        this." + getName(field) + " = bean." + getName(field) + ";");
+		pw.println("    }");
 
 	}
 
 	private void createClassConstructor(PrintWriter pw, IType clazz, List<IField> fields) throws JavaModelException {
 		String clazzName = clazz.getElementName();
-		pw.println(clazzName + "(Builder builder){");
+		pw.println("    "+clazzName + "(Builder builder){");
 		for (IField field : fields) {
-			pw.println("this." + getName(field) + "=builder." + getName(field) + ";");
+			pw.println("        this." + getName(field) + " = builder." + getName(field) + ";");
 		}
-		pw.println("}");
+		pw.println("    }");
 	}
 
 	private void createClassBuilderConstructor(PrintWriter pw, IType clazz, List<IField> fields) {
 		String clazzName = clazz.getElementName();
-		pw.println("public " + clazzName + " build(){");
-		pw.println("return new " + clazzName + "(this);\n}");
+		pw.println("        public " + clazzName + " build() {");
+		pw.println("            return new " + clazzName + "(this);");
+		pw.println("        }");
 	}
 
 	private void createPrivateBuilderConstructor(PrintWriter pw, IType clazz, List<IField> fields) {
 		String clazzName = clazz.getElementName();
 		String clazzVariable = clazzName.substring(0, 1).toLowerCase() + clazzName.substring(1);
-		pw.println("public " + clazzName + " build(){");
-		pw.println(clazzName + " " + clazzVariable + "=new " + clazzName + "();");
+		pw.println("        public " + clazzName + " build() {");
+		pw.println("            " + clazzName + " " + clazzVariable + " = new " + clazzName + "();");
 		for (IField field : fields) {
 			String name = getName(field);
-			pw.println(clazzVariable + "." + name + "=" + name + ";");
+			pw.println("            "+clazzVariable + "." + name + "=" + name + ";");
 		}
-		pw.println("return " + clazzVariable + ";\n}");
+		pw.println("            return " + clazzVariable + ";");
+		pw.println("        }");
 	}
 
 	private void createBuilderMethods(PrintWriter pw, List<IField> fields) throws JavaModelException {
@@ -151,9 +153,15 @@ public class BuilderGenerator implements Generator {
 			String fieldType = getType(field);
 			String baseName = getFieldBaseName(fieldName);
 			String parameterName = baseName + BUILDER_METHOD_PARAMETER_SUFFIX;
-			pw.println("public Builder " + baseName + "(" + fieldType + " " + parameterName + ") {");
-			pw.println("this." + fieldName + "=" + parameterName + ";");
-			pw.println("return this;\n}");
+			pw.println("        public Builder " + baseName + "(" + fieldType + " " + parameterName + ") {");
+			pw.println("            this." + fieldName + "=" + parameterName + ";");
+			pw.println("            return this;");
+			pw.println("        }");
+                        pw.println();
+			pw.println("        public " + fieldType + " " + baseName + "() {");
+			pw.println("            return this." + fieldName+";");
+			pw.println("        }");
+                        pw.println();
 		}
 	}
 
@@ -164,7 +172,7 @@ public class BuilderGenerator implements Generator {
 
 	private void createFieldDeclarations(PrintWriter pw, List<IField> fields) throws JavaModelException {
 		for (IField field : fields) {
-			pw.println(getType(field) + " " + getName(field) + ";");
+			pw.println("        private "+getType(field) + " " + getName(field) + ";");
 		}
 	}
 
